@@ -1,0 +1,10 @@
+{
+  "name": "alona-auth-assignment",
+  "version": "1.0.0",
+  "private": true,
+  "description": "User authentication assignment with PostgreSQL and SHA-256 password hashing.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

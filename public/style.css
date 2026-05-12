@@ -158,6 +158,95 @@ button {
   letter-spacing: 0.08em;
 }
 
+.card-wide {
+  max-width: 100%;
+}
+
+.form-grid-2col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-grid-2col .span-2 {
+  grid-column: span 2;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), #7a1f1f);
+}
+
+.alert.warning {
+  background: rgba(180, 120, 20, 0.12);
+  color: #7a4f00;
+  border: 1px solid rgba(180, 120, 20, 0.3);
+}
+
+.alert.warning code {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.table-wrap {
+  margin-top: 20px;
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.data-table th {
+  background: rgba(15, 106, 82, 0.1);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background: rgba(15, 106, 82, 0.05);
+}
+
+.role-badge-sm {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.role-badge-sm.admin {
+  background: rgba(15, 106, 82, 0.18);
+  color: var(--accent-strong);
+}
+
+.role-badge-sm.user {
+  background: #eee2c7;
+  color: var(--muted);
+}
+
 @media (max-width: 640px) {
   .topbar {
     flex-direction: column;
@@ -167,5 +256,13 @@ button {
   .panel {
     padding: 22px;
     border-radius: 18px;
+  }
+
+  .form-grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid-2col .span-2 {
+    grid-column: span 1;
   }
 }

@@ -78,6 +78,19 @@ async function getUserByCredentialsVulnerable(username, password) {
   return { id: Number(id), username: foundUsername, role };
 }
 
+// MITIGATED: single quotes are escaped before being inserted into the SQL string.
+// The dangerous character ' becomes '' (two single quotes), which PostgreSQL treats
+// as a literal quote character — it can no longer break out of the string boundary.
+async function getUserByCredentialsMitigated(username, password) {
+  const safeUsername = escapeSql(username);
+  const safePassword = escapeSql(password);
+  const sql = `SELECT id, username, role FROM app_users WHERE username='${safeUsername}' AND password_plain='${safePassword}'`;
+  const rows = await runPsql(sql);
+  if (rows.length === 0) return null;
+  const [id, foundUsername, role] = rows[0];
+  return { id: Number(id), username: foundUsername, role };
+}
+
 async function getAllUsersWithCards() {
   const rows = await runPsql(`
     SELECT u.id, u.username, u.role,
@@ -167,6 +180,7 @@ module.exports = {
   ensureAdminExists,
   getUserByUsername,
   getUserByCredentialsVulnerable,
+  getUserByCredentialsMitigated,
   getAllUsersWithCards,
   getCardByUserId,
   updateCard,

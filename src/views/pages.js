@@ -15,6 +15,7 @@ function renderLayout(title, content, session) {
        <a href="/logout">Logout</a>`
     : `<a href="/">Login</a>
        <a href="/vulnerable">Vulnerable Login</a>
+       <a href="/mitigated">Mitigated Login</a>
        <a href="/forgot-password">Forgot Password</a>`;
 
   return `<!DOCTYPE html>
@@ -88,6 +89,43 @@ function renderVulnerableLoginPage({ error = "" } = {}) {
       <button type="submit" class="btn-danger">Sign In (Vulnerable)</button>
     </form>
     <p class="fine-print"><a href="/">← Back to secure login</a></p>
+  </section>`;
+}
+
+function renderMitigatedLoginPage({ error = "", lastUsername = "", lastPassword = "" } = {}) {
+  const escaped = (v) => v ? `<code>${htmlEscape(v.replaceAll("'", "''"))}</code>` : "";
+
+  const injectionResult = lastUsername || lastPassword
+    ? `<div class="alert success">
+        <strong>Injection neutralised.</strong> The single quote <code>'</code> was escaped to <code>''</code> before hitting the database.<br><br>
+        What was actually sent to PostgreSQL:<br>
+        <code>WHERE username='${htmlEscape(lastUsername.replaceAll("'", "''"))}' AND password_plain='${htmlEscape(lastPassword.replaceAll("'", "''"))}'</code><br><br>
+        The <code>'</code> can no longer break out of the string — it is treated as a literal character.
+      </div>`
+    : "";
+
+  return `
+  <section class="card">
+    <h2>Mitigated Login</h2>
+    <div class="alert warning">
+      <strong>CW3 — SQL Injection Prevention.</strong> This form uses the same raw SQL as the vulnerable login,
+      but single quotes in the input are escaped to <code>''</code> before being inserted into the query.<br><br>
+      Try the same attacks — they will fail:<br>
+      <strong>Method 1:</strong> Username: <code>' or 1=1--</code><br>
+      <strong>Method 2:</strong> Password: <code>' or (1=1 and username='student')--</code>
+    </div>
+    ${injectionResult}
+    ${error ? `<div class="alert error">${htmlEscape(error)}</div>` : ""}
+    <form method="POST" action="/mitigated-login" class="form-grid">
+      <label>Username
+        <input type="text" name="username" autocomplete="off">
+      </label>
+      <label>Password
+        <input type="text" name="password" autocomplete="off" placeholder="visible so you can see injection payloads">
+      </label>
+      <button type="submit">Sign In (Mitigated)</button>
+    </form>
+    <p class="fine-print"><a href="/vulnerable">← Vulnerable Login</a> &nbsp;|&nbsp; <a href="/">Secure Login</a></p>
   </section>`;
 }
 
@@ -263,6 +301,7 @@ module.exports = {
   renderLayout,
   renderLoginPage,
   renderVulnerableLoginPage,
+  renderMitigatedLoginPage,
   renderForgotPasswordPage,
   renderResetLinkPage,
   renderResetPage,

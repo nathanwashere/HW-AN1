@@ -5,6 +5,7 @@ const { hashPassword, signSession, readSession } = require("./lib/security");
 const {
   getUserByUsername,
   getUserByCredentialsVulnerable,
+  getUserByCredentialsMitigated,
   getAllUsersWithCards,
   getCardByUserId,
   updateCard,
@@ -17,6 +18,7 @@ const {
   renderLayout,
   renderLoginPage,
   renderVulnerableLoginPage,
+  renderMitigatedLoginPage,
   renderForgotPasswordPage,
   renderResetLinkPage,
   renderResetPage,
@@ -115,6 +117,37 @@ function createServer() {
         if (!user) {
           return sendHtml(res, 401, renderLayout("Vulnerable Login",
             renderVulnerableLoginPage({ error: "No matching user found." }),
+            session
+          ));
+        }
+
+        return redirect(res, "/dashboard", [buildSessionCookie(user)]);
+      }
+
+      // ── mitigated login (SQL injection prevented) ───────────────────────
+      if (req.method === "GET" && url.pathname === "/mitigated") {
+        if (session) return redirect(res, "/dashboard");
+        return sendHtml(res, 200, renderLayout("Mitigated Login", renderMitigatedLoginPage(), session));
+      }
+
+      if (req.method === "POST" && url.pathname === "/mitigated-login") {
+        const body = await getRequestBody(req);
+        const username = String(body.username || "");
+        const password = String(body.password || "");
+
+        let user = null;
+        try {
+          user = await getUserByCredentialsMitigated(username, password);
+        } catch {
+          return sendHtml(res, 400, renderLayout("Mitigated Login",
+            renderMitigatedLoginPage({ error: "SQL error occurred." }),
+            session
+          ));
+        }
+
+        if (!user) {
+          return sendHtml(res, 401, renderLayout("Mitigated Login",
+            renderMitigatedLoginPage({ error: "No matching user found. Injection attempt was neutralised.", lastUsername: username, lastPassword: password }),
             session
           ));
         }
